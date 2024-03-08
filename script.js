@@ -22,20 +22,23 @@ class Board {
         this.board[x][y] = new Node(x, y);
       }
     }
+    this.pushMoves();
   }
 
   display() {
-    for (let i = 0; i < this.board.length; i++) {
-      console.log(this.board[i]);
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        console.log(this.board[i][j].possibleMoves);
+      }
     }
   }
 
   pushMoves() {
     for (let x = 0; x < this.board.length; x++) {
       for (let y = 0; y < this.board[x].length; y++) {
-        const knight = new Node(x, y);
+        const knight = this.board[x][y];
         knight.possibleMoves.push(
-          [
+          ...[
             [x + 2, y + 1],
             [x + 1, y + 2],
             [x + 2, y - 1],
@@ -57,33 +60,37 @@ class Board {
     }
   }
 
-  // knightMoves(start, end) {
-  //   const queue = [start];
-  //   const visited = new Set();
-  //   const result = [];
+  knightMoves(start, end) {
+    const startPosition = this.board[start[0]][start[1]];
+    const endPosition = this.board[end[0]][end[1]];
+    const queue = [[startPosition]];
+    const visited = new Set([startPosition]);
 
-  //   while (queue.length) {
-  //     const vertex = queue.shift();
-  //     if (vertex.position === end) {
-  //       return vertex.position;
-  //     }
-  //     if (!visited.has(vertex)) {
-  //       visited.add(vertex);
-  //       result.push(vertex);
+    while (queue.length !== 0) {
+      const currentPath = queue.shift();
+      const currentNode = currentPath[currentPath.length - 1];
 
-  //       for (const neighbour of this.board[vertex]) {
-  //         queue.push(neighbour);
-  //       }
-  //     }
-  //   }
+      if (
+        currentNode.position[0] === endPosition.position[0] &&
+        currentNode.position[1] === endPosition.position[1]
+      ) {
+        return currentPath.map((node) => node.position);
+      }
+      for (const neighbor of currentNode.possibleMoves) {
+        const nextNode = this.board[neighbor[0]][neighbor[1]];
 
-  //   return result;
-  // }
+        if (!visited.has(nextNode)) {
+          visited.add(nextNode);
+          queue.push([...currentPath, nextNode]);
+        }
+      }
+    }
+    return null;
+  }
 }
 
 const graph = new Board();
 
 graph.generateBoard();
-graph.pushMoves();
-graph.display();
-graph.func();
+const result = graph.knightMoves([0, 0], [6, 6]);
+console.log(result);
