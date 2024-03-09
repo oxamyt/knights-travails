@@ -1,3 +1,4 @@
+// Node class for knight
 class Node {
   constructor(x, y) {
     this.position = [x, y];
@@ -5,11 +6,13 @@ class Node {
   }
 }
 
+// Board class for gameBoard and methods
 class Board {
   constructor() {
     this.board = [];
   }
 
+  // Generating board and pushing nodes with possible moves
   generateBoard(r = 8, c = 8) {
     this.board = Array(r)
       .fill(0)
@@ -17,27 +20,11 @@ class Board {
         return Array(c).fill(0);
       });
 
+    // Loop for creating nodes with positions and possible moves
     for (let x = 0; x < r; x++) {
       for (let y = 0; y < c; y++) {
         this.board[x][y] = new Node(x, y);
-      }
-    }
-    this.pushMoves();
-  }
-
-  display() {
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        console.log(this.board[i][j].possibleMoves);
-      }
-    }
-  }
-
-  pushMoves() {
-    for (let x = 0; x < this.board.length; x++) {
-      for (let y = 0; y < this.board[x].length; y++) {
-        const knight = this.board[x][y];
-        knight.possibleMoves.push(
+        this.board[x][y].possibleMoves.push(
           ...[
             [x + 2, y + 1],
             [x + 1, y + 2],
@@ -55,21 +42,25 @@ class Board {
               ny < this.board[x].length
           )
         );
-        this.board[x][y] = knight;
       }
     }
   }
 
+  // Breadth-first search algorithm for shortest path
   knightMoves(start, end) {
     const startPosition = this.board[start[0]][start[1]];
     const endPosition = this.board[end[0]][end[1]];
+
+    // Queue for different paths
     const queue = [[startPosition]];
-    const visited = new Set([startPosition]);
+
+    // Visited nodes
+    const visited = new Set();
+    visited.add(startPosition);
 
     while (queue.length !== 0) {
       const currentPath = queue.shift();
       const currentNode = currentPath[currentPath.length - 1];
-
       if (
         currentNode.position[0] === endPosition.position[0] &&
         currentNode.position[1] === endPosition.position[1]
@@ -85,12 +76,13 @@ class Board {
         }
       }
     }
+
     return null;
   }
 }
 
+// Tests
 const graph = new Board();
 
 graph.generateBoard();
-const result = graph.knightMoves([0, 0], [6, 6]);
-console.log(result);
+console.log(graph.knightMoves([0, 0], [4, 5]));
